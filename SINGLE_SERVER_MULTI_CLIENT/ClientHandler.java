@@ -22,7 +22,7 @@ public class ClientHandler implements Runnable {
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.clientUsername = bufferedReader.readLine();
             clientHandlers.add(this);
-            broadcastMessage("SERVER: " + clientUsername + "has ");
+            broadcastMessage("SERVER: " + clientUsername + " has entered the group chat");
         } catch (Exception e) {
             // TODO: handle exception
             closeEverything(socket, bufferedReader, bufferedWriter);
