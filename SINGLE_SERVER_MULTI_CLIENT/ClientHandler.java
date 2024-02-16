@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class ClientHandler implements Runnable {
     
@@ -15,16 +16,14 @@ public class ClientHandler implements Runnable {
     private String clientUsername;
 
     public ClientHandler(Socket socket) {
-        
         try {
             this.socket = socket;
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.clientUsername = bufferedReader.readLine();
             clientHandlers.add(this);
-            broadcastMessage("SERVER: " + clientUsername + " has entered the group chat");
-        } catch (Exception e) {
-            // TODO: handle exception
+            broadcastMessage("SERVER: " + clientUsername + " has entered the chat");
+        } catch (IOException e) {
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
@@ -36,18 +35,25 @@ public class ClientHandler implements Runnable {
         while (socket.isConnected()) {
             try {
                 messageFromClient = bufferedReader.readLine();
-                broadcastMessage(messageFromClient);
-            } catch (IOException e) {
-                closeEverything(socket, bufferedReader, bufferedWriter);
-                break;
+                if(messageFromClient == null) {
+                    break; // Client has disconnected
             }
+                broadcastMessage(messageFromClient);
+        } catch (IOException e) {
+                break; // Client has disconnected
         }
     }
 
+        // Client has disconnected, handle it
+        closeEverything(socket, bufferedReader, bufferedWriter);
+        removeClientHandler();
+        broadcastMessage("SERVER: " + clientUsername + " has left the chat");
+}
+
     public void broadcastMessage(String messageToSend) {
-        
-        for (ClientHandler clientHandler : clientHandlers) {
-            
+        Iterator<ClientHandler> iterator = clientHandlers.iterator();
+        while (iterator.hasNext()) {
+            ClientHandler clientHandler = iterator.next();
             try {
                 if (!clientHandler.clientUsername.equals(clientUsername)) {
                     clientHandler.bufferedWriter.write(messageToSend);
@@ -55,24 +61,20 @@ public class ClientHandler implements Runnable {
                     clientHandler.bufferedWriter.flush();
                 }
             } catch (IOException e) {
-                // TODO: handle exception
-                closeEverything(socket, bufferedReader, bufferedWriter);
+                // Client has disconnected, handle it
+                iterator.remove();
+                closeEverything(clientHandler.socket, clientHandler.bufferedReader, clientHandler.bufferedWriter);
+                broadcastMessage("SERVER: " + clientHandler.clientUsername + " has left the chat");
             }
         }
     }
 
     public void removeClientHandler() {
         clientHandlers.remove(this);
-        broadcastMessage("SERVER: " + clientUsername + "has left the chat!");
     }
 
-    public void closeEverything(Socket socket, BufferedReader bufferedReader,
-                    BufferedWriter BufferedWriter) {
-        
+    public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter) {
         removeClientHandler();
-        /*
-         * Done to avoid potential null pointer exceptions
-         */
         try {
             if (bufferedReader != null) {
                 bufferedReader.close();
@@ -83,12 +85,7 @@ public class ClientHandler implements Runnable {
             if (socket != null) {
                 socket.close();
             }
-            if (bufferedReader != null) {
-                bufferedReader.close();
-            }
-            
         } catch (IOException e) {
-            // TODO: handle exception
             e.printStackTrace();
         }
     }

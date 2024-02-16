@@ -2,13 +2,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
 
-public class Server {
+public class Server {//
  
-    private ServerSocket serverSocket;
+    private ServerSocket serverSocket;//
 
-    public Server(ServerSocket serverSocket) {
-        this.serverSocket = serverSocket;
-    }
+    public Server(ServerSocket serverSocket) {//
+        this.serverSocket = serverSocket;//
+    }//
 
     /*
      * A thread is a sequence of instructions within a program that
@@ -17,23 +17,25 @@ public class Server {
      * When you launch an executable, it is running in a thread
      * within a process.
      */
-    public void startServer() {
+    public void startServer() {//
         
-        try {
+        try {//
             //First while loop is so that the server waits on the clients
-            while (!serverSocket.isClosed()) {
+            while (!serverSocket.isClosed()) {//
 
-                Socket socket = serverSocket.accept();
-                System.out.println("A new client has connected!");
-                ClientHandler clientHandler = new ClientHandler(socket);
+                Socket socket = serverSocket.accept();//
+                System.out.println("A new client has connected!");//
+                ClientHandler clientHandler = new ClientHandler(socket);//
             
-                Thread thread = new Thread(clientHandler);
-                thread.start();
+                /*
+                 * Spawning more threads is vital for allowing multiple clients
+                 */
+                Thread thread = new Thread(clientHandler);//
+                thread.start();//
             }
 
-        } catch (Exception e) {
+        } catch (IOException e) {//
             // TODO: handle exception
-            e.printStackTrace();
         }
     }
 
@@ -46,22 +48,22 @@ public class Server {
      * counter (which instruction is currently being executed);
      * registers, variable stores, file handlers, signals, etc.
      */
-    public void closeServer() {
-        try {
-            if (serverSocket != null) {
-                serverSocket.close();
-            }
-        } catch (Exception e) {
+    public void closeServerSocket() {//
+        try {//
+            if (serverSocket != null) {//
+                serverSocket.close();//
+            }//
+        } catch (IOException e) {//
             // TODO: handle exception
-            e.printStackTrace();
+            e.printStackTrace();//
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {//
         
         //1234 is an assigned port number
-        ServerSocket serverSocket = new ServerSocket(1234);
-        Server server = new Server(serverSocket);
-        server.startServer();
+        ServerSocket serverSocket = new ServerSocket(1234);//
+        Server server = new Server(serverSocket);//
+        server.startServer();//
     }
  }
