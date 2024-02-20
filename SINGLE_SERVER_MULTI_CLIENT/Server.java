@@ -19,7 +19,7 @@ public class Server {//
      */
     public void startServer() {//
         
-        try {//
+        try {
             //First while loop is so that the server waits on the clients
             while (!serverSocket.isClosed()) {//
 

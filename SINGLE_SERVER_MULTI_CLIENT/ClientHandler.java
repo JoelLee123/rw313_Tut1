@@ -29,27 +29,6 @@ public class ClientHandler implements Runnable {
     }
 
     @Override
-    public void run() {
-        String messageFromClient;
-
-        while (socket.isConnected()) {
-            try {
-                messageFromClient = bufferedReader.readLine();
-                if(messageFromClient == null) {
-                    break; // Client has disconnected
-            }
-                broadcastMessage(messageFromClient);
-        } catch (IOException e) {
-                break; // Client has disconnected
-        }
-    }
-
-        // Client has disconnected, handle it
-        closeEverything(socket, bufferedReader, bufferedWriter);
-        removeClientHandler();
-        broadcastMessage("SERVER: " + clientUsername + " has left the chat");
-}
-
     public void broadcastMessage(String messageToSend) {
         Iterator<ClientHandler> iterator = clientHandlers.iterator();
         while (iterator.hasNext()) {
