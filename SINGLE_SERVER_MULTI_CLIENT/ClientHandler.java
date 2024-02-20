@@ -36,6 +36,7 @@ public class ClientHandler implements Runnable {
             try {
                 messageFromClient = bufferedReader.readLine();
                 if(messageFromClient == null) {
+                    System.out.println(clientUsername + " has disconnected");
                     break; // Client has disconnected
             }
                 broadcastMessage(messageFromClient);
@@ -47,6 +48,7 @@ public class ClientHandler implements Runnable {
         // Client has disconnected, handle it
         closeEverything(socket, bufferedReader, bufferedWriter);
         removeClientHandler();
+        //What the clients will see
         broadcastMessage("SERVER: " + clientUsername + " has left the chat");
 }
 
@@ -69,6 +71,11 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    //Needed by Server.java
+    public String getUsername() {
+        return clientUsername;
+    }   
+    
     public void removeClientHandler() {
         clientHandlers.remove(this);
     }
