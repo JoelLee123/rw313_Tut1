@@ -29,6 +29,29 @@ public class ClientHandler implements Runnable {
     }
 
     @Override
+    public void run() {
+        String messageFromClient;
+
+        while (socket.isConnected()) {
+            try {
+                messageFromClient = bufferedReader.readLine();
+                if(messageFromClient == null) {
+                    System.out.println(clientUsername + " has disconnected");
+                    break; // Client has disconnected
+            }
+                broadcastMessage(messageFromClient);
+        } catch (IOException e) {
+                break; // Client has disconnected
+        }
+    }
+
+        // Client has disconnected, handle it
+        closeEverything(socket, bufferedReader, bufferedWriter);
+        removeClientHandler();
+        //What the clients will see
+        broadcastMessage("SERVER: " + clientUsername + " has left the chat");
+}
+
     public void broadcastMessage(String messageToSend) {
         Iterator<ClientHandler> iterator = clientHandlers.iterator();
         while (iterator.hasNext()) {
@@ -48,6 +71,11 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    //Needed by Server.java
+    public String getUsername() {
+        return clientUsername;
+    }   
+    
     public void removeClientHandler() {
         clientHandlers.remove(this);
     }

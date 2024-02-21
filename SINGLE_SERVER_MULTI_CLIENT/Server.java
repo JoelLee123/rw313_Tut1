@@ -19,14 +19,15 @@ public class Server {//
      */
     public void startServer() {//
         
+        String username;
         try {
             //First while loop is so that the server waits on the clients
-            while (!serverSocket.isClosed()) {//
+            while (!serverSocket.isClosed()) {
 
-                Socket socket = serverSocket.accept();//
-                System.out.println("A new client has connected!");//
-                ClientHandler clientHandler = new ClientHandler(socket);//
-            
+                Socket socket = serverSocket.accept();
+                ClientHandler clientHandler = new ClientHandler(socket);
+                username = clientHandler.getUsername();
+                System.out.println(username + " has connected!");
                 /*
                  * Spawning more threads is vital for allowing multiple clients
                  */
@@ -36,6 +37,7 @@ public class Server {//
 
         } catch (IOException e) {//
             // TODO: handle exception
+            
         }
     }
 
